@@ -11,7 +11,7 @@ namespace BeConnectedApiGateway
             var validations = new List<Validation>();
             var AuthToken = (ctx.Request.Headers.TryGetValue("AuthToken", out var authorizationToken)) ? authorizationToken.ToString() : string.Empty;
 
-            if (!string.IsNullOrEmpty(AuthToken))
+            if (string.IsNullOrEmpty(AuthToken))
             {
                 response.StatusCode = 401;
                 validations.Add(new Validation() { Key = "Token", Value = "dari api gateway" });

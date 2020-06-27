@@ -21,6 +21,7 @@ namespace BeConnectedApiGateway
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
             services.AddOcelot(Configuration);
         }
@@ -32,10 +33,6 @@ namespace BeConnectedApiGateway
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseHttpsRedirection();
-            app.UseRouting();
-            app.UseAuthorization();
-
             var config = new OcelotPipelineConfiguration
             {
                 // You can do whatever u want laaah...
@@ -46,17 +43,22 @@ namespace BeConnectedApiGateway
 
                     if (response.Validations.Count > 0)
                     {
-                        var json = Helper.JSONSerialize(response);
-                        ctx.Response.StatusCode = response.StatusCode;
-                        await ctx.Response.WriteAsync(json);
-
-                        ctx.Abort();
+                        ctx.Response.StatusCode = 401;
+                        ctx.Response.ContentType = "text/html";
+                        await ctx.Response.WriteAsync("<html lang=\"en\"><body>\r\n");
+                        await ctx.Response.WriteAsync("ERROR!BRO<br><br>\r\n");
                     }
-
-                    await next.Invoke();
+                    else
+                    {
+                        await next.Invoke();
+                    }
                 }
             };
 
+            app.UseHttpsRedirection();
+            app.UseRouting();
+            app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+            app.UseAuthentication();
             app.UseOcelot(config).Wait();
             app.UseEndpoints(endpoints =>
             {
