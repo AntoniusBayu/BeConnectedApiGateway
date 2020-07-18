@@ -14,7 +14,7 @@ namespace Business
         {
             try
             {
-                _uow.OpenConnection(_uow.GetAppSettings("MongoDBConnString"), _uow.GetAppSettings("DbName"));
+                _uow.OpenConnection(_uow.GetAppSettings("MongoDBConnectionString"), _uow.GetAppSettings("TableName"));
 
                 var repo = new ActivityLogRepository(_uow);
 

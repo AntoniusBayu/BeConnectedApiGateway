@@ -1,3 +1,5 @@
+using Business;
+using DataAccess;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -23,6 +25,9 @@ namespace BeConnectedApiGateway
         {
             services.AddCors();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
+            services.AddSingleton<IUnitofWork, MongoDBUnitofWork>();
+            services.AddSingleton<IConnection, MongoDBConnection>();
+            services.AddSingleton<IActivityLog, ActivityLogBusiness>();
             services.AddOcelot(Configuration);
         }
 
@@ -39,7 +44,7 @@ namespace BeConnectedApiGateway
                 // Logging, auth dll
                 AuthenticationMiddleware = async (ctx, next) =>
                 {
-                    var response = Security.IsVerified(ctx);
+                    var response = Security.IsVerified(ctx, app.ApplicationServices);
 
                     if (response.Validations.Count > 0)
                     {
